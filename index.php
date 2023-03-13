@@ -1,83 +1,3 @@
-<?php
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    error_reporting(-1);
-    function validateRecaptcha($recaptcha) {
-        $sendData['secret'] = '6LcdfIAhAAAAAMQ29Q4wCL7ne_lMg-_SxHDAd4R9';
-        $sendData['response'] = $recaptcha;
-        $sendData['remoteip'] = $_SERVER['REMOTE_ADDR'];
-
-        $url = "https://www.google.com/recaptcha/api/siteverify";
-
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $sendData);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_URL, $url);
-        
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $response = json_decode($response, true);
-
-        return $response['success'];
-    }
-
-    if (isset($_POST) && count($_POST) > 0){
-        if($_POST['sendit']=='1' && $_POST['g-recaptcha-response']!=null) {
-            $response = validateRecaptcha($_POST['g-recaptcha-response']);
-            $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-            
-            $to = "travnmorris@gmail.com";
-            $subject = "CBTS Pemesanan";
-        
-            $message = "
-            <html>
-            <head>
-            <title>Pesan dari CBTS</title>
-            </head>
-            <body>
-            <p>Ini adalah pesan dari web cbts.site</p>
-            <p>Silahkan balas ke email berikut ".$email."</p>
-            <table>
-            <tr>
-            <th>Nama</th>
-            <td>".$_POST['name']."</td>
-            </tr>
-            <tr>
-            <th>Email</th>
-            <td>".$email."</td>
-            </tr>
-            <tr>
-            <th>Sekolah</th>
-            <td>".$_POST['school']."</td>
-            </tr>
-            <tr>
-            <th>Pesan</th>
-            <td>".$_POST['message']."</td>
-            </tr>
-            </table>
-            </body>
-            </html>
-            ";
-        
-            $headers = "MIME-Version: 1.0" . "\r\n";
-            $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-            $headers .= 'From: <contact@cbts.site>' . "\r\n";
-            $headers .= 'Cc: contact@cbts.site' . "\r\n";
-
-            if($response==1) {
-                if(mail($to,$subject,$message,$headers)){
-                    echo '<script>alert("Terimakasih atas respon Anda. Silahkan menunggu balasan dari kami.");window.location.replace("'.$_SERVER['REQUEST_URI'].'");</script>';
-                } else {
-                    echo '<script>alert("Server error");</script>';
-                }
-            }
-        } else {
-            echo '<script>alert("Please confirm the Captcha!")</script>';
-        }
-    }
-?> 
 <!DOCTYPE html>
 <html lang="en">
 
@@ -419,7 +339,7 @@
                 <div class="col-lg-4 col-md-6 col-sm-12" data-scroll-reveal="enter bottom move 50px over 0.6s after 0.6s" style="margin: auto;">
                     <div class="pricing-item">
                         <div class="pricing-header">
-                            <h3 class="pricing-title">CBT Lokal VHD</h3>
+                            <h3 class="pricing-title">Lisensi CBT</h3>
                         </div>
                         <div class="pricing-body">
                             <div class="price-wrapper" style="background: #d74affb8;">
@@ -590,13 +510,13 @@
                         <p>Anda dapat kontak kami melalui form disamping atau melalui email untuk pemesanan dan pembelian lisensi CBT Online.</p>
                         <p>Sertakan informasi nama lengkap, email, nama sekolah, dan paket yang diinginkan. Silahkan menunggu balasan untuk info lebih lebih lanjut.</p>
                         <p>Kami akan sangat senang menerima masukkan dari Anda.</p>
-                        <!-- <span>Email: <a href="mailto:contact@cbts.site">contact@cbts.site</a><br></span> -->
+                        <span>Email: <a href="mailto:xidecvlt1@mozmail.com">xidecvlt1@mozmail.com</a><br></span>
                     </div>
                 </div>
                 <!-- ***** Contact Form Start ***** -->
                 <div class="col-lg-6 col-md-6 col-sm-12">
                     <div class="contact-form">
-                        <form id="contact" action="" method="post">
+                        <form id="contact" action="mailto:xidecvlt1@mozmail.com" method="get" enctype="text/plain">
                             <input type="hidden" name="sendit" value='1'>
                           <div class="row">
                             <div class="col-md-6 col-sm-12">
@@ -619,12 +539,6 @@
                                 <textarea name="message" rows="6" id="message" placeholder="Halo, saya ingin melakukan pemesanan cbt online paket ......" required="" class="contact-field"></textarea>
                               </fieldset>
                             </div>
-                            <div class="col-lg-12">
-                                <fieldset>
-                                    <div class="g-recaptcha" data-sitekey="6LcdfIAhAAAAAB0Haasqd7iJiZpf--Ma1UkI-qu3"></div>
-                                </fieldset>
-                            </div>
-                            <br>
                             <div class="col-lg-12">
                               <fieldset>
                                 <button class='main-button' onclick="event.preventDefault();onSubmit()">Kirim</button>
@@ -679,21 +593,16 @@
     <script>
         function onSubmit() {
             var valid = false;
-            if ($('#g-recaptcha-response').val() != "") {
-                $('input[type="text"]').each(function() {
-                    if ($(this).val() != "") {
-                        valid=true
-                    }
-                });
-                if ($('#message').val() != "") {
-                    if( !validateEmail($('#email').val())) { 
-                        valid = true;
-                    }
+            $('input[type="text"]').each(function() {
+                if ($(this).val() != "") {
+                    valid=true
                 }
-            } else {
-                alert("Please confirm the Captcha!");
+            });
+            if ($('#message').val() != "") {
+                if( !validateEmail($('#email').val())) { 
+                    valid = true;
+                }
             }
-
             if (valid) {
                 document.getElementById("contact").submit();
             } else {
